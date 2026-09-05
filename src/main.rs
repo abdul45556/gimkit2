@@ -1,11 +1,19 @@
+mod ScreenWindow;
+mod UiElements;
 mod player;
 
 use macroquad::prelude::*;
+
+use ScreenWindow::Window;
 use player::Player;
-const WORLD_SIZE: Vec2 = vec2(800., 500.);
+const WORLD_SIZE: Vec2 = vec2(1080., 500.);
 
 #[macroquad::main("game")]
 async fn main() {
+    set_pc_assets_folder("assets");
+
+    let image = load_image("character.png").await.unwrap();
+    let texture = Texture2D::from_image(&image);
     let mut player = Player::new(vec2(0., 0.), vec2(0., 0.));
 
     let border = Rect::new(
@@ -52,9 +60,37 @@ async fn main() {
             player.hitbox.x = border.right() - player.hitbox.w;
         }
 
-        player.draw();
+        let mut window = player.CreateWindow(vec2(0., 0.), vec2(1000., 500.), BLACK, 5.);
+        let mut frame = window.CreateFrame(vec2(0., 0.), vec2(1000., 500.), BLUE, DARKBLUE, 1., 5.);
+        let mut button = frame.CreateButton(
+            vec2(0., 0.),
+            vec2(500., 200.),
+            DARKBLUE,
+            BLACK,
+            1.,
+            5.,
+            &camera,
+        );
+        let textlabel = frame.CreateTextlabel(
+            vec2(-300., 0.),
+            vec2(0., 200.),
+            String::from("QUESTIONS"),
+            100.,
+            BLACK,
+            1.,
+        );
+        if button.button_pressed(MouseButton::Left) {
+            println!("pressed")
+        }
 
         draw_rectangle_lines(border.x, border.y, border.w, border.h, 1., BLUE);
+        player.texturedraw(&texture);
+        player.draw();
+        window.draw();
+        frame.draw();
+        button.draw();
+        textlabel.draw();
+
         next_frame().await
     }
 }
