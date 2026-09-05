@@ -1,10 +1,8 @@
-mod ScreenWindow;
 mod UiElements;
 mod player;
 
+use UiElements::ScreenWindow;
 use macroquad::prelude::*;
-
-use ScreenWindow::Window;
 use player::Player;
 const WORLD_SIZE: Vec2 = vec2(1080., 500.);
 
@@ -22,16 +20,21 @@ async fn main() {
         WORLD_SIZE.x,
         WORLD_SIZE.y,
     );
+    let mut camera = Camera2D {
+        target: vec2(player.hitbox.x, player.hitbox.y + 5.),
+        zoom: vec2(2.0 / screen_width(), 2.0 / screen_height()),
+        ..Default::default()
+    };
 
     loop {
-        let camera = Camera2D {
-            target: vec2(player.hitbox.x, player.hitbox.y + 5.),
-            zoom: vec2(2.0 / screen_width(), 2.0 / screen_height()),
-            ..Default::default()
-        };
+        camera.target = vec2(player.hitbox.x, player.hitbox.y + 5.);
+        camera.zoom = vec2(2.0 / screen_width(), 2.0 / screen_height());
         set_camera(&camera);
-        clear_background(WHITE);
 
+        let fps = get_fps();
+
+        clear_background(WHITE);
+        draw_text(&format!("FPS: {}", fps), 0., 0., 50., BLACK);
         if is_key_down(KeyCode::A) {
             player.vel.x = -200.
         } else if is_key_down(KeyCode::D) {
@@ -60,36 +63,9 @@ async fn main() {
             player.hitbox.x = border.right() - player.hitbox.w;
         }
 
-        let mut window = player.CreateWindow(vec2(0., 0.), vec2(1000., 500.), BLACK, 5.);
-        let mut frame = window.CreateFrame(vec2(0., 0.), vec2(1000., 500.), BLUE, DARKBLUE, 1., 5.);
-        let mut button = frame.CreateButton(
-            vec2(0., 0.),
-            vec2(500., 200.),
-            DARKBLUE,
-            BLACK,
-            1.,
-            5.,
-            &camera,
-        );
-        let textlabel = frame.CreateTextlabel(
-            vec2(-300., 0.),
-            vec2(0., 200.),
-            String::from("QUESTIONS"),
-            100.,
-            BLACK,
-            1.,
-        );
-        if button.button_pressed(MouseButton::Left) {
-            println!("pressed")
-        }
-
-        draw_rectangle_lines(border.x, border.y, border.w, border.h, 1., BLUE);
+        draw_rectangle_lines(border.x, border.y, border.w, border.h, 5., BLUE);
         player.texturedraw(&texture);
         player.draw();
-        window.draw();
-        frame.draw();
-        button.draw();
-        textlabel.draw();
 
         next_frame().await
     }

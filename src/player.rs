@@ -41,6 +41,7 @@ impl Player {
         self.hitbox.x += self.vel.x * get_frame_time();
         self.hitbox.y += self.vel.y * get_frame_time()
     }
+    
 
     pub fn CreateWindow(
         &mut self,

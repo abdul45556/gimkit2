@@ -1,4 +1,3 @@
-use egui::TextBuffer;
 use macroquad::{color, prelude::*};
 
 pub struct Textlabel {
